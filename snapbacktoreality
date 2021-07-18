@@ -65,7 +65,7 @@ performance:AddToggle({
 	state = false,
 	callback = function(a)
 		if Library.flags['cleanbody'] then
-			Library.flags["connections"]['cleanbody'] = game.Workspace.IgnoreList.ChildAdded:Connect(function(c)o
+			Library.flags["connections"]['cleanbody'] = game.Workspace.IgnoreList.ChildAdded:Connect(function(c)
 				if c:IsA("Model") then
 					c:Destroy()
 				end
