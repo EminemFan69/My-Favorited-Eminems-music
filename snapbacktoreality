@@ -762,6 +762,6 @@ end
 
 
 while active and RunService.RenderStepped:Wait() do
-	UpdateLighting()
+	--UpdateLighting()
 	updateESP()
 end
