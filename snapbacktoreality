@@ -223,6 +223,9 @@ autorepairfold:AddToggle({
 		if Library.flags['autofix'] then
 			while Library.flags["connections"]['autofix'] and wait() do
 				for _, item in pairs(itemstorepair) do
+					if not Library.flags["connections"]['autofix'] then
+						break
+					end
 					if Library.flags[item] then
 						sellrepair:FireServer(item)
 					end
@@ -277,7 +280,7 @@ local remotemelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteMelee"
 local remotefiremelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteFireMelee");
 local RemoteCritMelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteCritMelee");
 
-local oldNameCall;
+--[[local oldNameCall;
 oldNameCall = hookmetamethod(game, "__namecall", function(...)
 	local Self, Args = (...), ({select(2, ...)})
 	if getnamecallmethod() == "Kick" and Self == plr then 
@@ -289,11 +292,11 @@ oldNameCall = hookmetamethod(game, "__namecall", function(...)
 		return oldNameCall(Self, unpack(Args))
 	end
 	return oldNameCall(...)
-end)
+end)]]
 
 local cheats = Window:AddFolder('gaming chair')
 
-cheats:AddToggle({
+--[[cheats:AddToggle({
 	text = "Silent aim",
 	flag = "silentaim",
 	state = false,
@@ -309,7 +312,7 @@ cheats:AddToggle({
 			Library.flags["connections"]['Silent Aim']:Disconnect()
 		end
 	end
-})
+})]]
 
 function meleeAura()
 	local zombies = workspace:FindFirstChild("Zombies")
