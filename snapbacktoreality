@@ -1,5 +1,6 @@
-local services = setmetatable({},{__index=
-	function(self,service)
+local services = setmetatable({}, {
+	__index =
+		function(self, service)
 		self = game:GetService(service) or nil
 		return self
 	end,
@@ -9,9 +10,9 @@ local StarterGui = services.StarterGui
 local UserInputService = services.UserInputService
 local repl = services.ReplicatedStorage
 local players = services.Players
-local RunService= services.RunService
+local RunService = services.RunService
 
-function notif(title,text)
+function notif(title, text)
 	StarterGui:SetCore("SendNotification", {
 		Title = title;
 		Text = text
@@ -20,7 +21,7 @@ end
 
 local melees = {}
 local camera = workspace.CurrentCamera
-local ambient = Color3.new(80/255,80/255,80/255)
+local ambient = Color3.new(80 / 255, 80 / 255, 80 / 255)
 local brightness = 2
 local plr = players.LocalPlayer
 local Mouse = plr:GetMouse()
@@ -76,7 +77,7 @@ performance:AddToggle({
 	end
 })
 
-function WaitForChildOfClass(parent,className,timeOut)
+function WaitForChildOfClass(parent, className, timeOut)
 	local waitTime = 0
 	local warned = false
 	repeat
@@ -86,10 +87,12 @@ function WaitForChildOfClass(parent,className,timeOut)
 		else
 			waitTime = waitTime + RunService.RenderStepped:Wait()
 			if timeOut then 
-				if waitTime > timeOut then return nil end
+				if waitTime > timeOut then
+					return nil
+				end
 			elseif not warned then
 				if waitTime > 5 then 
-					warn("Infinite yield possible waiting on",parent:GetFullName() .. ":FindFirstChildOfClass(\"".. className .. "\")")
+					warn("Infinite yield possible waiting on", parent:GetFullName()..":FindFirstChildOfClass(\""..className.."\")")
 					warned = true
 				end
 			end
@@ -110,8 +113,8 @@ performance:AddToggle({
 							if new.Parent and new.Parent:IsA("Part") then
 								new = new.Parent
 								new:ClearAllChildren()
-								new.Size = Vector3.new(new.Size.X,2,new.Size.Z)
-								new.Color = Color3.new(170,0,0)
+								new.Size = Vector3.new(new.Size.X, 2, new.Size.Z)
+								new.Color = Color3.new(170, 0, 0)
 								new.Material = Enum.Material.Neon
 								new.Transparency = .4
 							end
@@ -132,11 +135,11 @@ local autoupgrade = Window:AddFolder('upgrades')
 local UpgradeWeapon = repl:WaitForChild("RemoteEvents"):WaitForChild("UpgradeWeapon");
 local UpgradeStructurePlayer = repl:WaitForChild("RemoteEvents"):WaitForChild("UpgradeStructurePlayer");
 
-local function upgradeweapon(gearname,upgradename)
-	UpgradeWeapon:FireServer(gearname,upgradename)
+local function upgradeweapon(gearname, upgradename)
+	UpgradeWeapon:FireServer(gearname, upgradename)
 end
-local function upgradeshop(name,upgrade)
-	UpgradeStructurePlayer:FireServer(name,upgrade,true)
+local function upgradeshop(name, upgrade)
+	UpgradeStructurePlayer:FireServer(name, upgrade, true)
 end
 
 autoupgrade:AddToggle({
@@ -161,8 +164,8 @@ autoupgrade:AddToggle({
 					if check(weapon) then
 						local a = plr:FindFirstChild("Upgrades").GunUpgrades[weapon.Name]
 						if a then
-							for _,v in pairs(a:GetChildren()) do
-								upgradeweapon(weapon.Name,v.Name)
+							for _, v in pairs(a:GetChildren()) do
+								upgradeweapon(weapon.Name, v.Name)
 							end
 						end
 					end
@@ -172,11 +175,11 @@ autoupgrade:AddToggle({
 						if not Library.flags['autoupgrade_shop'] and not Library.flags['autoupgrade'] then
 							break
 						end
-						for _,v in pairs(shopthings.Upgrades:GetChildren()) do
+						for _, v in pairs(shopthings.Upgrades:GetChildren()) do
 							if not Library.flags['autoupgrade_shop'] and not Library.flags['autoupgrade'] then
 								break
 							end
-							upgradeshop(shopthings.Name,v)
+							upgradeshop(shopthings.Name, v)
 						end
 					end
 					--[[for _, shopthings in pairs(repl.Upgrades:GetChildren()) do
@@ -293,10 +296,12 @@ local RemoteCritMelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteCr
 
 local oldNameCall;
 oldNameCall = hookmetamethod(game, "__namecall", function(...)
-	local Self, Args = (...), ({select(2, ...)})
+	local Self, Args = (...), ({
+		select(2, ...)
+	})
 	if getnamecallmethod() == "Kick" and Self == plr then 
 		warn("Kick bypassed")
-		notif("epic","Bypassed game's kick attempt.")
+		notif("epic", "Bypassed game's kick attempt.")
 		return
 	elseif Library.flags['silentaim'] and getnamecallmethod() == "FindPartOnRayWithIgnoreList" and Head then
 		Args[1] = PositionToRay(camera.CFrame.Position, Head.Position)
@@ -313,12 +318,12 @@ cheats:AddToggle({
 	state = false,
 	callback = function(a)
 		if Library.flags['silentaim'] then
-			notif("epic","Silent aim: ON.")
+			notif("epic", "Silent aim: ON.")
 			Library.flags["connections"]['Silent Aim'] = RunService.RenderStepped:Connect(function()
 				GetClosestZombieFromCursor()
 			end)
 		else
-			notif("epic","Silent aim: OFF.")
+			notif("epic", "Silent aim: OFF.")
 			Head = nil
 			Library.flags["connections"]['Silent Aim']:Disconnect()
 		end
@@ -328,10 +333,12 @@ cheats:AddToggle({
 function meleeAura()
 	local zombies = workspace:FindFirstChild("Zombies")
 	local toDeal = {}
-	local meleestoDeal = {"Melee"}
+	local meleestoDeal = {
+		"Melee"
+	}
 	for _, item in pairs(plr:FindFirstChild("Backgear"):GetChildren()) do
 		if melees[item.Name] then
-			table.insert(meleestoDeal,item)
+			table.insert(meleestoDeal, item)
 		end
 	end
 	for _, v in pairs(zombies:GetChildren()) do
@@ -346,7 +353,10 @@ function meleeAura()
 					UnderStun = true,
 					OverStun = true,
 				}
-				table.insert(toDeal,{ v.Torso, mod})
+				table.insert(toDeal, {
+					v.Torso,
+					mod
+				})
 			end
 		end
 	end
@@ -364,12 +374,12 @@ cheats:AddToggle({
 	state = false,
 	callback = function(a)
 		if Library.flags['meleeaura'] then
-			notif("epic","Melee aura: ON.")
+			notif("epic", "Melee aura: ON.")
 			Library.flags["connections"]['Melee aura'] = RunService.Heartbeat:Connect(function()
 				meleeAura()
 			end)
 		else
-			notif("epic","Melee aura: OFF.")
+			notif("epic", "Melee aura: OFF.")
 			Library.flags["connections"]['Melee aura']:Disconnect()
 		end
 	end
@@ -384,11 +394,11 @@ cheats:AddToggle({
 			Library.flags["connections"]['trollserver'] = RunService.Heartbeat:Connect(function()
 				for _, shopthings in pairs(repl.Upgrades:GetChildren()) do
 					if shopthings:FindFirstChild("Upgrades") then
-						for _,v in pairs(shopthings.Upgrades:GetChildren()) do
+						for _, v in pairs(shopthings.Upgrades:GetChildren()) do
 							if not Library.flags["connections"]['trollserver'] then
 								break
 							end
-							upgradeshop(shopthings.Name,v)
+							upgradeshop(shopthings.Name, v)
 						end
 					end
 				end
@@ -503,7 +513,7 @@ zombie:AddToggle({
 						funcs.Boxbbg.Size = UDim2.new(5, 1, 5)
 						funcs.Boxbbg.MaxDistance = math.huge
 
-						local a,b,c,d = Instance.new("Frame", funcs.Boxbbg), Instance.new("Frame", funcs.Boxbbg), Instance.new("Frame", funcs.Boxbbg), Instance.new("Frame", funcs.Boxbbg)
+						local a, b, c, d = Instance.new("Frame", funcs.Boxbbg), Instance.new("Frame", funcs.Boxbbg), Instance.new("Frame", funcs.Boxbbg), Instance.new("Frame", funcs.Boxbbg)
 						a.Size = UDim2.new(0, 1, 1, 0)
 						a.Position = UDim2.new(0, 0, 0, 0)
 						b.Size = UDim2.new(0, 1, 1, 0)
@@ -514,14 +524,14 @@ zombie:AddToggle({
 						d.Position = UDim2.new(0, 0, 1, -1)
 						for i, v in pairs(funcs.Boxbbg:GetChildren()) do
 							v.BackgroundColor3 = Library.flags['zombie_color']
-							v.BorderColor3 = Color3.new(0,0,0)
+							v.BorderColor3 = Color3.new(0, 0, 0)
 							v.BorderSizePixel = .4
 						end
 					end
 
 					for i, v in pairs(funcs.Boxbbg:GetChildren()) do
 						v.BackgroundColor3 = Library.flags['zombie_color']
-						v.BorderColor3 = Color3.new(0,0,0)
+						v.BorderColor3 = Color3.new(0, 0, 0)
 						v.BorderSizePixel = .4
 					end
 
@@ -571,7 +581,9 @@ zombie:AddToggle({
 				end
 			end
 
-			table.insert(Library.flags['tracer_']['zombies'],setmetatable({},{__index=funcs}))
+			table.insert(Library.flags['tracer_']['zombies'], setmetatable({}, {
+				__index = funcs
+			}))
 		end
 		if Library.flags["esptarget_zombie"] then
 			local zombies = workspace:FindFirstChild("Zombies")
@@ -585,7 +597,7 @@ zombie:AddToggle({
 					end
 				end)
 
-				for i,zombie in pairs(zombies:GetChildren()) do
+				for i, zombie in pairs(zombies:GetChildren()) do
 					if zombie and zombie:FindFirstChild("Zombie") and zombie:FindFirstChild("Head") and zombie.Zombie.Health > 0 then
 						setupTracer(zombie)
 					end
@@ -618,16 +630,16 @@ esp:AddToggle({
 })
 
 local function tp(pos)
-	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(plr.Character.PrimaryPart.Position,1)
-	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(plr.Character.PrimaryPart.Position,2)
-	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(pos.Position,3)
+	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(plr.Character.PrimaryPart.Position, 1)
+	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(plr.Character.PrimaryPart.Position, 2)
+	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(pos.Position, 3)
 	plr.Character.HumanoidRootPart.CFrame = pos
 end
 
 local mouse = plr:GetMouse()
 function tpTo(pos)
 	pcall(function()
-		tp(GetClosestZombieFromCursor().Position + Vector3.new(1,1,0))
+		tp(GetClosestZombieFromCursor().Position + Vector3.new(1, 1, 0))
 		if plr.Character:FindFirstChildOfClass('Humanoid') and plr.Character:FindFirstChildOfClass('Humanoid').SeatPart then
 			plr.Character:FindFirstChildOfClass('Humanoid').Sit = false
 			wait(.1)
@@ -638,11 +650,21 @@ end
 
 local d = false
 local Boomer = Library:CreateWindow("Boomer")
-Boomer:AddLabel({text = " Plz use dis when spectate."})
-Boomer:AddLabel({text = " Notice: u need armour"})
-Boomer:AddLabel({text = "  with 'last stand' upgrd"})
-Boomer:AddLabel({text = "  inother to works."})
-Boomer:AddLabel({text = " *Good ping is required."})
+Boomer:AddLabel({
+	text = " Plz use dis when spectate."
+})
+Boomer:AddLabel({
+	text = " Notice: u need armour"
+})
+Boomer:AddLabel({
+	text = "  with 'last stand' upgrd"
+})
+Boomer:AddLabel({
+	text = "  inother to works."
+})
+Boomer:AddLabel({
+	text = " *Good ping is required."
+})
 
 Boomer:AddToggle({
 	text = "Free cam",
@@ -665,7 +687,7 @@ Boomer:AddToggle({
 			Library.flags["connections"]['click_explode'] = Mouse.Button1Down:connect(function()
 				if not d then
 					d = true
-					tpTo(mouse.Hit + Vector3.new(0,7,0))
+					tpTo(mouse.Hit + Vector3.new(0, 7, 0))
 					wait(.5)
 					d = false
 				end
@@ -680,8 +702,8 @@ local function getPlayerByFewChars(word)
 	if #word <= 0 then
 		return nil
 	end
-	for _,v in pairs(game.Players:GetPlayers()) do 
-		if v and v.Name:lower():sub(1,#word) == word:lower() then
+	for _, v in pairs(game.Players:GetPlayers()) do 
+		if v and v.Name:lower():sub(1, #word) == word:lower() then
 			return v
 		end
 	end
@@ -700,7 +722,7 @@ Boomer:AddToggle({
 					if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
 						local distance = 0
 						if results.Character ~= nil then
-							tpTo(results.CFrame + Vector3.new(distance,1,0))
+							tpTo(results.CFrame + Vector3.new(distance, 1, 0))
 						end
 					end
 				end
@@ -710,7 +732,9 @@ Boomer:AddToggle({
 		end
 	end
 })
-local targetlabel = Boomer:AddLabel({text = " Player:"})
+local targetlabel = Boomer:AddLabel({
+	text = " Player:"
+})
 Boomer:AddBox({
 	text = "Plr name here", 
 	flag = "target_explosion_player", 
@@ -719,7 +743,7 @@ Boomer:AddBox({
 		local results = getPlayerByFewChars(a)
 		if results then
 			print(results.Name)
-			targetlabel.Text = " Player: ".. results.Name
+			targetlabel.Text = " Player: "..results.Name
 		else
 			targetlabel.Text = " Player: "
 		end
@@ -747,7 +771,7 @@ Window:AddButton({
 			CamUtil.UA()
 		end
 		destroyEsps()
-		for i,v in pairs(Library.flags['connections']) do
+		for i, v in pairs(Library.flags['connections']) do
 			v:Disconnect()
 		end
 		active = false
