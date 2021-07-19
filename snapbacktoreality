@@ -838,9 +838,12 @@ local function updateESP()
 	end
 end
 
-
+repeat wait() until plr:FindFirstChildWhichIsA("PlayerGui")
 
 while active and RunService.RenderStepped:Wait() do
 	UpdateLighting()
 	updateESP()
+	pcall(function()
+		plr:FindFirstChildWhichIsA("PlayerGui").ScreenGui.Overlays.Fade.Visible = false
+	end)	
 end
