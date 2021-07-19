@@ -709,17 +709,19 @@ Boomer:AddToggle({
 	callback = function(n)
 		if Library.flags['loop_explode_to_zombies'] then
 			Library.flags["connections"]['loop_explode_to_zombies'] = RunService.Heartbeat:connect(function()
-				local zombies = workspace:FindFirstChild("Zombies")
-				local zombie = math.random(1,#zombies:GetChildren())
-				zombie = zombies:GetChildren()[zombie]
-				if zombie ~= nil and zombie:FindFirstChild("Head") and zombie:FindFirstChild("Zombie") then
-					if zombie.Zombie.Health ~= 0 then
-						if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
-							local distance = 0
-							tpTo(zombie.Head.CFrame + Vector3.new(distance, 1, 0))
+				pcall(function()
+					local zombies = workspace:FindFirstChild("Zombies")
+					local zombie = math.random(1,#zombies:GetChildren())
+					zombie = zombies:GetChildren()[zombie]
+					if zombie ~= nil and zombie:FindFirstChild("Head") and zombie:FindFirstChild("Zombie") then
+						if zombie.Zombie.Health ~= 0 then
+							if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+								local distance = 0
+								tpTo(zombie.Head.CFrame + Vector3.new(distance, 1, 0))
+							end
 						end
 					end
-				end
+				end)
 			end)
 		else
 			Library.flags["connections"]['loop_explode_to_zombies']:Disconnect()
@@ -734,13 +736,15 @@ Boomer:AddToggle({
 	callback = function(v)
 		if Library.flags['loop_explode_to_zombies_cursor'] then
 			Library.flags["connections"]['loop_explode_to_zombies_cursor'] = RunService.Heartbeat:connect(function()
-				local results = GetClosestZombieFromCursor()
-				if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
-					local distance = 0
-					if results ~= nil then
-						tpTo(results.CFrame + Vector3.new(distance, 1, 0))
+				pcall(function()
+					local results = GetClosestZombieFromCursor()
+					if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+						local distance = 0
+						if results ~= nil then
+							tpTo(results.CFrame + Vector3.new(distance, 1, 0))
+						end
 					end
-				end
+				end)
 			end)
 		else
 			Library.flags["connections"]['loop_explode_to_zombies_cursor']:Disconnect()
@@ -756,13 +760,15 @@ Boomer:AddToggle({
 		if Library.flags['loop_explode'] then
 			Library.flags["connections"]['loop_explode'] = RunService.Heartbeat:connect(function()
 				if #Library.flags["target_explosion_player"] > 0 and not Library.flags['loop_explode_to_zombies'] and not Library.flags['loop_explode_to_zombies_cursor'] then
-					local results = getPlayerByFewChars(Library.flags["target_explosion_player"])
-					if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
-						local distance = 0
-						if results.Character ~= nil then
-							tpTo(results.Character.HumanoidRootPart.CFrame + Vector3.new(distance, 1, 0))
+					pcall(function()
+						local results = getPlayerByFewChars(Library.flags["target_explosion_player"])
+						if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+							local distance = 0
+							if results.Character ~= nil then
+								tpTo(results.Character.HumanoidRootPart.CFrame + Vector3.new(distance, 1, 0))
+							end
 						end
-					end
+					end)
 				end
 			end)
 		else
