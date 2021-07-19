@@ -103,15 +103,22 @@ performance:AddToggle({
 	state = false,
 	callback = function(a)
 		if Library.flags['cleanparticle'] then
-			Library.flags["connections"]['cleanparticle'] = game.Workspace.IgnoreList.ChildAdded:Connect(function(new)
-				if new:IsA("Part") then
-					if WaitForChildOfClass(new,"ParticleEmitter",5) then
-						new:ClearAllChildren()
-						new.Size = Vector3.new(new.Size.X,2,new.Size.Z)
-						new.Color = Color3.new(170,0,0)
-						new.Material = Enum.Material.Neon
-						new.Transparency = .4
-					end
+			Library.flags["connections"]['cleanparticle'] = workspace.DescendantAdded:Connect(function(new)
+				if new:IsA("ParticleEmitter") then
+					pcall(function()
+						if new.Name == "FireParticles" or new.Name == "FireParticlesSmall" then
+							if new.Parent and new.Parent:IsA("Part") then
+								new = new.Parent
+								new:ClearAllChildren()
+								new.Size = Vector3.new(new.Size.X,2,new.Size.Z)
+								new.Color = Color3.new(170,0,0)
+								new.Material = Enum.Material.Neon
+								new.Transparency = .4
+							end
+						else
+							new:Destroy()
+						end
+					end)
 				end
 			end)
 		else
@@ -140,16 +147,14 @@ autoupgrade:AddToggle({
 		local function check(weapon)
 			if weapon.Name == "Pistol" and Library.flags["autoupgrade_ignorepistol"] then
 				return false
-			end
-			if melees[weapon.Name] and not Library.flags["autoupgrade_melees"] then
+			elseif melees[weapon.Name] and not Library.flags["autoupgrade_melees"] then
 				return false
-			end
-			if not Library.flags["autoupgrade_weapons"] then
+			elseif not melees[weapon.Name] and not Library.flags["autoupgrade_weapons"] then
 				return false
 			end
 			return true
 		end
-		
+
 		if Library.flags['autoupgrade'] then
 			while Library.flags['autoupgrade'] and wait() do
 				for _, weapon in pairs(plr:FindFirstChild("Backgear"):GetChildren()) do
@@ -164,7 +169,13 @@ autoupgrade:AddToggle({
 				end
 				if Library.flags["autoupgrade_shop"] then
 					for _, shopthings in pairs(plr:FindFirstChild("Upgrades").PlayerUpgrades:GetChildren()) do
+						if not Library.flags['autoupgrade_shop'] and not Library.flags['autoupgrade'] then
+							break
+						end
 						for _,v in pairs(shopthings.Upgrades:GetChildren()) do
+							if not Library.flags['autoupgrade_shop'] and not Library.flags['autoupgrade'] then
+								break
+							end
 							upgradeshop(shopthings.Name,v)
 						end
 					end
@@ -221,9 +232,9 @@ autorepairfold:AddToggle({
 	state = false,
 	callback = function(a)
 		if Library.flags['autofix'] then
-			while Library.flags["connections"]['autofix'] and wait() do
+			while Library.flags['autofix'] and wait() do
 				for _, item in pairs(itemstorepair) do
-					if not Library.flags["connections"]['autofix'] then
+					if not Library.flags['autofix'] then
 						break
 					end
 					if Library.flags[item] then
@@ -280,7 +291,7 @@ local remotemelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteMelee"
 local remotefiremelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteFireMelee");
 local RemoteCritMelee = repl:WaitForChild("RemoteEvents"):WaitForChild("RemoteCritMelee");
 
---[[local oldNameCall;
+local oldNameCall;
 oldNameCall = hookmetamethod(game, "__namecall", function(...)
 	local Self, Args = (...), ({select(2, ...)})
 	if getnamecallmethod() == "Kick" and Self == plr then 
@@ -292,11 +303,11 @@ oldNameCall = hookmetamethod(game, "__namecall", function(...)
 		return oldNameCall(Self, unpack(Args))
 	end
 	return oldNameCall(...)
-end)]]
+end)
 
 local cheats = Window:AddFolder('gaming chair')
 
---[[cheats:AddToggle({
+cheats:AddToggle({
 	text = "Silent aim",
 	flag = "silentaim",
 	state = false,
@@ -312,7 +323,7 @@ local cheats = Window:AddFolder('gaming chair')
 			Library.flags["connections"]['Silent Aim']:Disconnect()
 		end
 	end
-})]]
+})
 
 function meleeAura()
 	local zombies = workspace:FindFirstChild("Zombies")
@@ -340,9 +351,9 @@ function meleeAura()
 		end
 	end
 	for _, melee in pairs(meleestoDeal) do
-		RemoteCritMelee:FireServer(melee, false, {
+		--[[RemoteCritMelee:FireServer(melee, false, {
 			WalkSpeed = math.huge
-		});
+		});]]
 		remotefiremelee:FireServer(melee, toDeal);
 	end
 end
@@ -625,7 +636,7 @@ function tpTo(pos)
 	end)
 end
 
---[[local d = false
+local d = false
 local Boomer = Library:CreateWindow("Boomer")
 Boomer:AddLabel({text = " Plz use dis when spectate."})
 Boomer:AddLabel({text = " Notice: u need armour"})
@@ -714,7 +725,7 @@ Boomer:AddBox({
 		end
 	end
 })
-]]
+
 
 
 Window:AddBind({
@@ -762,6 +773,6 @@ end
 
 
 while active and RunService.RenderStepped:Wait() do
-	--UpdateLighting()
+	UpdateLighting()
 	updateESP()
 end
