@@ -629,22 +629,14 @@ esp:AddToggle({
 	state = false,
 })
 
-local function tp(pos)
-	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(plr.Character.PrimaryPart.Position, 1)
-	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(plr.Character.PrimaryPart.Position, 2)
-	game.ReplicatedStorage.RemoteEvents.PlayerTeleport:FireServer(pos.Position, 3)
-	plr.Character.HumanoidRootPart.CFrame = pos
-end
-
 local mouse = plr:GetMouse()
 function tpTo(pos)
 	pcall(function()
-		tp(GetClosestZombieFromCursor().Position + Vector3.new(1, 1, 0))
 		if plr.Character:FindFirstChildOfClass('Humanoid') and plr.Character:FindFirstChildOfClass('Humanoid').SeatPart then
 			plr.Character:FindFirstChildOfClass('Humanoid').Sit = false
 			wait(.1)
 		end
-		tp(pos)
+		plr.Character.HumanoidRootPart.CFrame = pos
 	end)
 end
 
@@ -688,7 +680,7 @@ Boomer:AddToggle({
 				if not d then
 					d = true
 					tpTo(mouse.Hit + Vector3.new(0, 7, 0))
-					wait(.5)
+					wait()
 					d = false
 				end
 			end)
@@ -711,18 +703,64 @@ local function getPlayerByFewChars(word)
 end
 
 Boomer:AddToggle({
-	text = "Loop explosion",
+	text = "Loop explosion to zombies",
+	flag = "loop_explode_to_zombies",
+	state = false,
+	callback = function(n)
+		if Library.flags['loop_explode_to_zombies'] then
+			Library.flags["connections"]['loop_explode_to_zombies'] = RunService.Heartbeat:connect(function()
+				local zombies = workspace:FindFirstChild("Zombies")
+				local zombie = math.random(1,#zombies:GetChildren())
+				zombie = zombies:GetChildren()[zombie]
+				if zombie ~= nil and zombie:FindFirstChild("Head") and zombie:FindFirstChild("Zombie") then
+					if zombie.Zombie.Health ~= 0 then
+						if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+							local distance = 0
+							tpTo(zombie.Head.CFrame + Vector3.new(distance, 1, 0))
+						end
+					end
+				end
+			end)
+		else
+			Library.flags["connections"]['loop_explode_to_zombies']:Disconnect()
+		end
+	end
+})
+
+Boomer:AddToggle({
+	text = "Loop exp to zoms from cursor",
+	flag = "loop_explode_to_zombies_cursor",
+	state = false,
+	callback = function(v)
+		if Library.flags['loop_explode_to_zombies_cursor'] then
+			Library.flags["connections"]['loop_explode_to_zombies_cursor'] = RunService.Heartbeat:connect(function()
+				local results = GetClosestZombieFromCursor()
+				if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
+					local distance = 0
+					if results ~= nil then
+						tpTo(results.CFrame + Vector3.new(distance, 1, 0))
+					end
+				end
+			end)
+		else
+			Library.flags["connections"]['loop_explode_to_zombies_cursor']:Disconnect()
+		end
+	end
+})
+
+Boomer:AddToggle({
+	text = "Loop explosion player",
 	flag = "loop_explode",
 	state = false,
 	callback = function(v)
 		if Library.flags['loop_explode'] then
-			Library.flags["connections"]['loop_explode'] = RunService.RenderStepped:connect(function()
-				if #Library.flags["target_explosion_player"] > 0 then
+			Library.flags["connections"]['loop_explode'] = RunService.Heartbeat:connect(function()
+				if #Library.flags["target_explosion_player"] > 0 and not Library.flags['loop_explode_to_zombies'] and not Library.flags['loop_explode_to_zombies_cursor'] then
 					local results = getPlayerByFewChars(Library.flags["target_explosion_player"])
 					if results and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") then
 						local distance = 0
 						if results.Character ~= nil then
-							tpTo(results.CFrame + Vector3.new(distance, 1, 0))
+							tpTo(results.Character.HumanoidRootPart.CFrame + Vector3.new(distance, 1, 0))
 						end
 					end
 				end
